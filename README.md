@@ -1,2 +1,2 @@
 # ccc-lab
-Templating for CCC Fweb experiments
+Templating for CCC web experiments
