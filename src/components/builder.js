@@ -3,6 +3,9 @@ import Trash from '../assets/trash.svg'
 import Doc from '../assets/document.svg'
 import Star from '../assets/star.svg'
 import * as $ from 'jquery'
+import Config from '../assets/config.svg'
+import { Title } from './ui.js'
+import Download from '../assets/download.svg'
 
 const responseType = {
     'likert': {
@@ -100,7 +103,6 @@ $(document).ready(function() {
             }
             $('input[type=checkbox]').change(() => {
                 $(this).prop('checked', !$(this).prop('checked'))
-                console.log($(this).prop('checked'))
             })
             $('#cols').val(JSON.stringify(colsObject))
         })
@@ -111,7 +113,7 @@ $(document).ready(function() {
         $('#downloadLink').css('display', 'none')
         console.log(e)
         const json = {}
-        const csv = e.target[0].files[0]
+        const csv = e.target[1].files[0]
         var reader = new FileReader()
         reader.readAsText(csv)
         reader.addEventListener('load', () => {
@@ -189,7 +191,6 @@ $(document).ready(function() {
 
             json['instructions'] = {}
             $('.instructions').map((idx, item) => {
-                console.log(item.value, idx)
                 json['instructions']['instructions-' + idx] = item.value
             })
 
@@ -215,13 +216,14 @@ $(document).ready(function() {
             json['versions'] = Object.keys(json['stimuli'])
             
             $('#downloadLink').css('display', 'flex')
+            $('#downloadLink').attr('download', `${json['project_id']}_config.json`)
             $('#downloadLink').attr("href", `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(json, null, 2))}`)
             console.log(json)
     
         })
-        const cols = JSON.parse(e.target[1].value)
-        const col = e.target[2].value
-        const sort = e.target[3].value
+        const cols = JSON.parse(e.target[2].value)
+        const col = e.target[3].value
+        const sort = e.target[4].value
 
         var data = new FormData(e.target)
         data = [... data.entries()]
@@ -231,7 +233,6 @@ $(document).ready(function() {
 const Form = () => {
 
     const [instructions, setInstructions] = useState([{idx: 1, content: ""}, {idx: 2, content: ""}])
-    // console.log(instructions)
 
     const editContent = (i, e) => {
         let newInstructions = [...instructions]
@@ -256,12 +257,9 @@ const Form = () => {
     }
 
     const [outros, setOutros] = useState([{idx: 1, content: ""}])
-    console.log(outros)
-    // console.log(instructions)
 
     const setOutro = (i, e) => {
         let newOutros = [...outros]
-        console.log(i)
 
         newOutros[i - 1].content = e.target.value
         setOutros(newOutros)
@@ -284,8 +282,20 @@ const Form = () => {
     }
 
     return (
-        <form id='main' className="-flex -jc-c -col">
+        <form id='main' className="-flex -jc-c -col -al-c">
+            <Title src={Config} txt='Configuration generator' />
             <div className=' -flex -col form-wrapper'>
+                <h3>name project</h3>
+                <p>Please choose a project ID including only letters and numbers -- no spaces or puncutation, please.</p>
+                <div className="-flex -col label-input-wrapper -jc-start -full-width">
+                    <label htmlFor="project_id">Enter project name</label>
+                    <input 
+                        id="project_id" 
+                        name="project_id" 
+                        type="text" 
+                    >
+                    </input>
+                </div>
                 <h3>add stimuli data</h3>
                 <div className="-flex -col label-input-wrapper -jc-start -full-width">
                     <label htmlFor="stimuli">Upload .csv file</label>
@@ -343,6 +353,12 @@ const Form = () => {
                     <img className='icon' src={Star}></img>
                     Generate config.json
                 </div>
+                <a id='downloadLink'>
+                    <div className='-flex -jc-c -al-c download -gap'>
+                        <img className='icon' src={Download}></img>
+                        Download config.json
+                    </div>
+                </a>
             </div>
         </form>
     )
@@ -366,10 +382,7 @@ const TrialBlock = (props) => {
 
 
     const [options, setOptions] = useState([])
-    console.log(options)
     const [type, setType] = useState('likert')
-
-    console.log(type)
 
     const handleType = (e) => {
         setType(e.target.value)

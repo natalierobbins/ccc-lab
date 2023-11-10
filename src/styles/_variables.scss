@@ -2,3 +2,14 @@ $blue-dark: #344668;
 $blue: #5d78a6;
 $blue-hover: #607bab;
 $blue-light: #d8e0ef;
+
+%button {
+    border-radius: 7px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    width: 505px;
+    font-size: 20px;
+    cursor: pointer;
+    font-weight: bold;
+
+}

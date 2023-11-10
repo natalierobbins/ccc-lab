@@ -30,7 +30,7 @@ h1 {
 #root {
     display: flex;
     flex-direction: column;
-    padding: 75px;
+    width: 100%;
     justify-content: center;
 }
 
@@ -126,6 +126,14 @@ input[type=number] {
     @extend input, [type=text];
 }
 
+h4 {
+    margin: 0px;
+}
+
 :place-holder {
     color: $blue-light;
+}
+
+#logo {
+    width: 100px;
 }
