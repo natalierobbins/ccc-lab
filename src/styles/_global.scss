@@ -34,6 +34,18 @@ h1 {
     justify-content: center;
 }
 
+#target-wrapper {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    width: 100%;
+}
+
+#countdown {
+    width: 100%;
+    text-align: center;
+}
+
 .form-wrapper {
     gap: 20px;
     width: 500px;
@@ -77,11 +89,11 @@ h1 {
     width: 100%;
 }
 
-p {
-    margin: 0px;
-    font-size: 14px;
-    color: $blue;
-}
+// p {
+//     margin: 0px;
+//     font-size: 14px;
+//     color: $blue;
+// }
 
 select {
     height: 35px;

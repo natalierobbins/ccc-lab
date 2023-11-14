@@ -9,7 +9,15 @@ const JsPsych = () => {
     runner(id, ver)
     
     return (
-        <div id="jspsych-target"><div id="load-text" className="very-large"></div></div>
+        <div id='target-wrapper'>
+            <div id="jspsych-target">
+                <div id="load-text" className="very-large"></div>
+            </div>
+            <br></br>
+            <br></br>
+            <div id='countdown'>
+            </div>
+        </div>
     )
 }
 

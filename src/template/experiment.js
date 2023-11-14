@@ -14,6 +14,7 @@ import jsPsychPreload from '@jspsych/plugin-preload';
 import jsPsychHtmlKeyboardResponse from '@jspsych/plugin-html-keyboard-response';
 import jsPsychHtmlButtonResponse from '@jspsych/plugin-html-button-response';
 import jsPsychSurveyLikert from '@jspsych/plugin-survey-likert';
+import $ from 'jquery'
 
 export class Experiment {
     constructor(params, firebaseStorage, firebaseDatabase, stimRef) {
@@ -218,11 +219,12 @@ export class Experiment {
                 questions: [
                     {
                         prompt: params.promptcontent,
-                        labels: params.options.map(item => {return `<br>${item}`})
+                        labels: params.options
                     }
                 ],
                 scale_width: 500,
                 on_start: async function() {
+                    $('#countdown').text('')
                     var req = ref(stimRef, `${stimulus[params.cols[params.files.stimulusContent]]}`)
                     const res = await getBlob(req)
                     var audio_src = URL.createObjectURL(res)
@@ -249,6 +251,19 @@ export class Experiment {
             }
         }
 
+        var initCountdown = (len) => {
+            var remaining = len / 1000
+            $('#countdown').text(`Break started. Time remaining: ${remaining}`)
+            remaining -= 1
+            var countdown = setInterval(() => {
+                if (remaining <= 1) {
+                    clearInterval(countdown)
+                }
+                $('#countdown').text(`Break started. Time remaining: ${remaining}`)
+                remaining -= 1
+            }, 1000)
+        }
+
          /* initTrials()
           * Assuming that all of your stimuli are relatively uniform, you can init all
           * of them with one for loop. If not, use this function to initialize your trials
@@ -257,10 +272,20 @@ export class Experiment {
           * item being a single stimulus (likely also a list)
           * So, in the example below, we are accessing the stimuli list at i's text column
           */ 
-        this.initTrials = (exp, stimuli) => {
-            const stimColumn = params.cols[params.files.stimulusContent]
+        this.initTrials = (exp, stimuli, breaks) => {
             for (let i = 0; i < stimuli.length; i++) {
                 var trial = initTrial(exp, stimuli[i]);
+
+                var block_size = stimuli.length / (breaks.num_breaks + 1)
+
+                if ((i + 1) % block_size == 0 && (i + 1) != stimuli.length) {
+                    console.log('break after this trial')
+                    trial['post_trial_gap'] = breaks.len_breaks
+                    trial['on_finish'] = function(data) {
+                        trial['on_finish'](data)
+                        initCountdown(breaks.len_breaks)
+                    }
+                }
                 // push to timeline
                 add(trial);
             } // for i
@@ -303,7 +328,9 @@ export class Experiment {
             // push experiment trials -- in this case, expID is the same as the name of
             // each list, so we can access our given stimuli list this way
             console.log('!!!', this.expID())
-            this.initTrials(this.expID(), params.stimuli[this.verID()]);
+
+
+            this.initTrials(this.expID(), params.stimuli[this.verID()], params.breaks);
 
             // initialize your jsPsych object
             var jsPsych = initJsPsych({

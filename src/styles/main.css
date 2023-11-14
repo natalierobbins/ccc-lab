@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap");
 .upload, .generate, .download {
   border-radius: 7px;
   padding-top: 10px;
@@ -44,6 +45,18 @@ h1 {
   justify-content: center;
 }
 
+#target-wrapper {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  width: 100%;
+}
+
+#countdown {
+  width: 100%;
+  text-align: center;
+}
+
 .form-wrapper {
   gap: 20px;
   width: 500px;
@@ -76,12 +89,6 @@ h1 {
 
 .-full-width {
   width: 100%;
-}
-
-p {
-  margin: 0px;
-  font-size: 14px;
-  color: #5d78a6;
 }
 
 select {

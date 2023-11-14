@@ -132,7 +132,7 @@ var loadStimuliAndRun = (stimuli, urlVars, storage, database) => {
  * TODO: insert your email into call to errorTextGenerator()
  */ 
 var showUserError = (errorType) => {
-    var errorText = errorTextGenerator(errorType, 'YOUR_EMAIL_HERE@YOUR_INSTITUTION_HERE.edu') // TODO: YOUR EMAIL HERE
+    var errorText = errorTextGenerator(errorType, 'robbinat@umich.edu') // TODO: YOUR EMAIL HERE
   $( '#jspsych-target' ).append($('<div>', {
      id: 'error',
      class: 'text-center',
