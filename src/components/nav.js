@@ -3,6 +3,12 @@ import Search from '../assets/search.svg'
 import Lnk from '../assets/link.svg'
 import { Link } from 'react-router-dom'
 
+// const NavBody = () => {
+//     return (
+//         <Authentication body={<Nav />} />
+//     )
+// }
+
 const NavBody = () => {
     return (
         <div className='-flex -col -gap -jc-c -full-width -al-c'>

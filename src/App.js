@@ -1,11 +1,20 @@
 import Form from './components/builder'
 import FirebaseUpload from './components/upload'
 import AdminEditor from './components/admin.js'
-import { Header } from './components/ui.js'
+import { Header, Authentication } from './components/ui.js'
 import CSVCombine from './components/combine.js'
 import NavBody from './components/nav.js'
 import JsPsych from './components/jspsych.js'
 import 'jspsych/css/jspsych.css'
+
+const Wrapper = ({page}) => {
+  return (
+    <div className='-flex -jc-c -col -gap'>
+      <Header />
+      <Authentication body={page} />
+    </div>
+  )
+}
 
 export const LogIn = () => {
   <div className='-flex -jc-c -col -gap'>
@@ -16,10 +25,7 @@ export const LogIn = () => {
 
 export const Builder = () => {
   return (
-    <div className='-flex -jc-c -col -gap'>
-      <Header />
-      <Form />
-    </div>
+    <Wrapper page={<Form />} />
   );
 }
 
@@ -52,10 +58,7 @@ export const Admin = () => {
 
 export const Nav = () => {
   return (
-    <div className='-flex -jc-c -col -gap'>
-      <Header />
-      <NavBody />
-    </div>
+    <Wrapper page={<NavBody />} />
   )
 }
 
