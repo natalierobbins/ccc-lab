@@ -1,0 +1,23 @@
+.nav-button {
+    background-color: $white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: $green-dark;
+    border: 0.5px solid $grey;
+    border-radius: 3px;
+    padding: 15px;
+    width: 400px;
+    filter: drop-shadow($grey-light 1px 1px 1px);
+    font-size: 14px;
+
+}
+
+.nav-button:hover {
+    filter: drop-shadow($grey-light 1.5px 1.5px 1.5px)
+}
+
+.nav-button-wrapper {
+    gap: 15px;
+    width: 400px;
+}

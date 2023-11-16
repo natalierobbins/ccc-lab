@@ -225,10 +225,15 @@ export class Experiment {
                 scale_width: 500,
                 on_start: async function() {
                     $('#countdown').text('')
+                    console.log('hello')
+                    $('.jspsych-content-wrapper').css('visibility', 'hidden')
                     var req = ref(stimRef, `${stimulus[params.cols[params.files.stimulusContent]]}`)
                     const res = await getBlob(req)
                     var audio_src = URL.createObjectURL(res)
                     var audio = new Audio(audio_src)
+                    audio.addEventListener('ended', (e) => {
+                        $('.jspsych-content-wrapper').css('visibility', 'visible')
+                    })
                     audio.play()
                 },
                 // here is an example of an on_finish function that checks if a
@@ -279,7 +284,6 @@ export class Experiment {
                 var block_size = stimuli.length / (breaks.num_breaks + 1)
 
                 if ((i + 1) % block_size == 0 && (i + 1) != stimuli.length) {
-                    console.log('break after this trial')
                     trial['post_trial_gap'] = breaks.len_breaks
                     trial['on_finish'] = function(data) {
                         trial['on_finish'](data)
