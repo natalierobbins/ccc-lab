@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Trash from '../assets/trash.svg'
 import Doc from '../assets/document.svg'
 import Star from '../assets/star.svg'
@@ -6,6 +6,11 @@ import * as $ from 'jquery'
 import Config from '../assets/config.svg'
 import { Title } from './ui.js'
 import Download from '../assets/download.svg'
+import NavBody from './nav.js'
+import { ref, getBlob, listAll } from 'firebase/storage'
+import { storage, auth } from '../firebase'
+import { getConfig } from '../template/runner'
+import {useParams} from "react-router-dom"
 
 const responseType = {
     'likert': {
@@ -232,136 +237,160 @@ $(document).ready(function() {
 
 const Form = () => {
 
-    const [instructions, setInstructions] = useState([{idx: 1, content: ""}, {idx: 2, content: ""}])
+    const [ config, setConfig ] = useState(null)
+    const { id } = useParams()
 
-    const editContent = (i, e) => {
-        let newInstructions = [...instructions]
-        newInstructions[i - 1].content = e.target.value
-        setInstructions(newInstructions)
-    }
-
-    const removeInstructions = (i, e) => {
-        let newInstructions = instructions.filter(item => item.idx != i)
-        let idx = 1
-        newInstructions.map(item => {
-            $(`#instructions-${idx}`).val(item.content)
-            item.idx = idx++
+    useEffect(() => {
+        const getExpConfig = (() => {
+            setConfig(getConfig(id))
+            console.log(config)
         })
-        setInstructions(newInstructions)
-    }
 
-    const addInstructions = () => {
-        let newInstructions = [...instructions]
-        newInstructions.length ? newInstructions.push({idx: newInstructions.at(-1).idx + 1, content: ""}) : newInstructions.push({idx: 1, content: ""})
-        setInstructions(newInstructions)
-    }
+        if (!config) {
+            getExpConfig()
+        }
 
-    const [outros, setOutros] = useState([{idx: 1, content: ""}])
+    }, [config])
 
-    const setOutro = (i, e) => {
-        let newOutros = [...outros]
-
-        newOutros[i - 1].content = e.target.value
-        setOutros(newOutros)
-    }
-
-    const removeOutro = (i, e) => {
-        let newOutros = outros.filter(item => item.idx != i)
-        let idx = 1
-        newOutros.map(item => {
-            $(`#exit-${idx}`).val(item.content)
-            item.idx = idx++
-        })
-        setOutros(newOutros)
-    }
-
-    const addOutro = () => {
-        let newOutros = [...outros]
-        newOutros.length ? newOutros.push({idx: newOutros.at(-1).idx + 1, content: ""}) : newOutros.push({idx: 1, content: ""})
-        setOutros(newOutros)
-    }
-
-    return (
-        <form id='main' className="-flex -jc-c -col -al-c">
-            <Title src={Config} txt='Configuration generator' />
-            <div className=' -flex -col form-wrapper'>
-                <h3>name project</h3>
-                <p>Please choose a project ID including only letters and numbers -- no spaces or puncutation, please.</p>
-                <div className="-flex -col label-input-wrapper -jc-start -full-width">
-                    <label htmlFor="project_id">Enter project name</label>
-                    <input 
-                        id="project_id" 
-                        name="project_id" 
-                        type="text" 
-                    >
-                    </input>
+    if (config) {
+        return (
+            <form>
+                <h1>Modify existing experiment</h1>
+                <div>
                 </div>
-                <h3>add stimuli data</h3>
-                <div className="-flex -col label-input-wrapper -jc-start -full-width">
-                    <label htmlFor="stimuli">Upload .csv file</label>
-                    <input 
-                        id="stimuli" 
-                        name="stimuli" 
-                        type="file" 
-                        accept="text/csv">
-                    </input>
-                </div>
-                <input
-                    type="hidden"
-                    id="cols"
-                    name="cols">
-                </input>
-                <h3>DATA SETTINGS</h3>
-                <p>If you do not have a sort-by column, choosing the same separate-by column will preserve the order on your spreadsheet.</p>
-                <ExpSettings />
-                <h3>INSTRUCTIONS SETTINGS</h3>
-                <p>The following message(s) will display before the experiment begins.</p>
-                <p style={{marginBottom: '-15px'}}>Please wrap each separate paragraph with &lt;p&gt;&lt;/p&gt; tags. Ex:</p>
-                <p style={{marginBottom: '-15px'}}>&lt;p&gt;Here is one paragraph&lt;/p&gt;</p>
-                <p >&lt;p&gt;Here is another paragraph&lt;/p&gt;</p>
-                <div className='-flex -col -jc-start -full-width -gap' id='instructions_block'>
-                {instructions.map(item => {
-                    return (
-                        <TextBlock type='instructions' key={item.idx} i={item.idx} edit={e => editContent(item.idx, e)} delete={e => removeInstructions(item.idx, e)} />
-                    )
-                })}
-                <div className='add icon-wrapper -full-width -flex -jc-c -al-c' onClick={addInstructions}>
-                    <img className='icon' src={Doc}></img>
-                    <p>Add</p>
-                </div>
-                </div>
-                <h3>trial settings</h3>
-                <TrialBlock />
-                <h3>Exit message settings</h3>
-                <p>The following message(s) will be displayed after all trials are complete</p>
-                {outros.map(item => {
-                    return (
-                        <TextBlock type='exit' key={item.idx} i={item.idx} edit={e => setOutro(item.idx, e)} delete={e => removeOutro(item.idx, e)} />
-                    )
-                })}
-                <div className='add icon-wrapper -full-width -flex -jc-c -al-c' onClick={addOutro}>
-                    <img className='icon' src={Doc}></img>
-                    <p>Add</p>
-                </div>
-                <h3>Output settings</h3>
-                <p>Select any columns you'd like preserved in the output data</p>
-                <div className="-flex -col label-input-wrapper -jc-start -full-width" id='output_data'>
+            </form>
+        )    
+    }
+    // const [instructions, setInstructions] = useState([{idx: 1, content: ""}, {idx: 2, content: ""}])
+
+    // const editContent = (i, e) => {
+    //     let newInstructions = [...instructions]
+    //     newInstructions[i - 1].content = e.target.value
+    //     setInstructions(newInstructions)
+    // }
+
+    // const removeInstructions = (i, e) => {
+    //     let newInstructions = instructions.filter(item => item.idx != i)
+    //     let idx = 1
+    //     newInstructions.map(item => {
+    //         $(`#instructions-${idx}`).val(item.content)
+    //         item.idx = idx++
+    //     })
+    //     setInstructions(newInstructions)
+    // }
+
+    // const addInstructions = () => {
+    //     let newInstructions = [...instructions]
+    //     newInstructions.length ? newInstructions.push({idx: newInstructions.at(-1).idx + 1, content: ""}) : newInstructions.push({idx: 1, content: ""})
+    //     setInstructions(newInstructions)
+    // }
+
+    // const [outros, setOutros] = useState([{idx: 1, content: ""}])
+
+    // const setOutro = (i, e) => {
+    //     let newOutros = [...outros]
+
+    //     newOutros[i - 1].content = e.target.value
+    //     setOutros(newOutros)
+    // }
+
+    // const removeOutro = (i, e) => {
+    //     let newOutros = outros.filter(item => item.idx != i)
+    //     let idx = 1
+    //     newOutros.map(item => {
+    //         $(`#exit-${idx}`).val(item.content)
+    //         item.idx = idx++
+    //     })
+    //     setOutros(newOutros)
+    // }
+
+    // const addOutro = () => {
+    //     let newOutros = [...outros]
+    //     newOutros.length ? newOutros.push({idx: newOutros.at(-1).idx + 1, content: ""}) : newOutros.push({idx: 1, content: ""})
+    //     setOutros(newOutros)
+    // }
+
+    // return (
+    //     <form id='main' className="-flex -jc-c -col -al-c">
+    //         <Title txt='Modify existing experiment' />
+    //         <div className=' -flex -col form-wrapper'>
+    //             <h3>name project</h3>
+    //             <p>Please choose a project ID including only letters and numbers -- no spaces or puncutation, please.</p>
+    //             <div className="-flex -col label-input-wrapper -jc-start -full-width">
+    //                 <label htmlFor="project_id">Enter project name</label>
+    //                 <input 
+    //                     id="project_id" 
+    //                     name="project_id" 
+    //                     type="text" 
+    //                 >
+    //                 </input>
+    //             </div>
+    //             <h3>add stimuli data</h3>
+    //             <div className="-flex -col label-input-wrapper -jc-start -full-width">
+    //                 <label htmlFor="stimuli">Upload .csv file</label>
+    //                 <input 
+    //                     id="stimuli" 
+    //                     name="stimuli" 
+    //                     type="file" 
+    //                     accept="text/csv">
+    //                 </input>
+    //             </div>
+    //             <input
+    //                 type="hidden"
+    //                 id="cols"
+    //                 name="cols">
+    //             </input>
+    //             <h3>DATA SETTINGS</h3>
+    //             <p>If you do not have a sort-by column, choosing the same separate-by column will preserve the order on your spreadsheet.</p>
+    //             <ExpSettings />
+    //             <h3>INSTRUCTIONS SETTINGS</h3>
+    //             <p>The following message(s) will display before the experiment begins.</p>
+    //             <p style={{marginBottom: '-15px'}}>Please wrap each separate paragraph with &lt;p&gt;&lt;/p&gt; tags. Ex:</p>
+    //             <p style={{marginBottom: '-15px'}}>&lt;p&gt;Here is one paragraph&lt;/p&gt;</p>
+    //             <p >&lt;p&gt;Here is another paragraph&lt;/p&gt;</p>
+    //             <div className='-flex -col -jc-start -full-width -gap' id='instructions_block'>
+    //             {instructions.map(item => {
+    //                 return (
+    //                     <TextBlock type='instructions' key={item.idx} i={item.idx} edit={e => editContent(item.idx, e)} delete={e => removeInstructions(item.idx, e)} />
+    //                 )
+    //             })}
+    //             <div className='add icon-wrapper -full-width -flex -jc-c -al-c' onClick={addInstructions}>
+    //                 <img className='icon' src={Doc}></img>
+    //                 <p>Add</p>
+    //             </div>
+    //             </div>
+    //             <h3>trial settings</h3>
+    //             <TrialBlock />
+    //             <h3>Exit message settings</h3>
+    //             <p>The following message(s) will be displayed after all trials are complete</p>
+    //             {outros.map(item => {
+    //                 return (
+    //                     <TextBlock type='exit' key={item.idx} i={item.idx} edit={e => setOutro(item.idx, e)} delete={e => removeOutro(item.idx, e)} />
+    //                 )
+    //             })}
+    //             <div className='add icon-wrapper -full-width -flex -jc-c -al-c' onClick={addOutro}>
+    //                 <img className='icon' src={Doc}></img>
+    //                 <p>Add</p>
+    //             </div>
+    //             <h3>Output settings</h3>
+    //             <p>Select any columns you'd like preserved in the output data</p>
+    //             <div className="-flex -col label-input-wrapper -jc-start -full-width" id='output_data'>
                     
-                </div>
+    //             </div>
                 
-                <div className='-flex generate -gap -jc-c -al-c' onClick={e => $('#main').submit()}>
-                    <img className='icon' src={Star}></img>
-                    Generate config.json
-                </div>
-                <a id='downloadLink'>
-                    <div className='-flex -jc-c -al-c download -gap'>
-                        <img className='icon' src={Download}></img>
-                        Download config.json
-                    </div>
-                </a>
-            </div>
-        </form>
-    )
+    //             <div className='-flex generate -gap -jc-c -al-c' onClick={e => $('#main').submit()}>
+    //                 <img className='icon' src={Star}></img>
+    //                 Generate config.json
+    //             </div>
+    //             <a id='downloadLink'>
+    //                 <div className='-flex -jc-c -al-c download -gap'>
+    //                     <img className='icon' src={Download}></img>
+    //                     Download config.json
+    //                 </div>
+    //             </a>
+    //         </div>
+    //     </form>
+    // )
 }
 
 const TextBlock = (props) => {
@@ -376,6 +405,53 @@ const TextBlock = (props) => {
             </div>
         </div>
     )
+}
+
+const temp = [
+    {
+        'destination': '/',
+        'text': 'test'
+    }
+]
+
+export const ExpNav = () => {
+
+    const [ exps, setExps ] = useState(null)
+
+    useEffect(() => {
+
+        const getExperiments = async () => {
+            const expRef = ref(storage, '/_configs/')
+            listAll(expRef)
+                .then((res) => {
+                    const expList = res.items.map((item) => {
+
+                        var exp = item._location.path_.replace('_configs/', '').replace('_config.json', '')
+
+                        return {
+                            'destination': `/modify/${exp}`,
+                            'text': exp
+                        }
+                    })
+                    console.log(expList)
+                    setExps(expList)
+                })
+                .catch((err) => {
+                    console.log(err)
+                })
+        }
+
+        if (!exps) {
+            getExperiments()
+        }
+
+    }, [exps])
+
+    if (exps) {
+        return (
+            <NavBody title='Modify existing experiment' links={exps} />
+        )
+    }
 }
 
 const TrialBlock = (props) => {

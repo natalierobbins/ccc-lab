@@ -6,8 +6,7 @@ import { get, ref as dbRef, child } from 'firebase/database'
 import { ref, getBlob } from 'firebase/storage'
 import { Experiment } from './experiment.js'
 
-async function getConfig(id) {
-    console.log('hello')
+export async function getConfig(id) {
     const configRef = ref(storage, `/_configs/${id}_config.json`)
     const req = await getBlob(configRef)
     const res = await req.text()
@@ -32,7 +31,6 @@ const runner = (exp, ver) => {
 
         getConfig(urlVars.expID)
             .then(config => {
-                console.log(config)
 
             getParticipantCompletion(urlVars.pID, database, config).then(res => {
                 // if there is data, and if that data shows participant has already completed
@@ -107,11 +105,9 @@ var getParticipantCompletion = async (pID, database, stimuli) => {
  */
 var loadStimuliAndRun = (stimuli, urlVars, storage, database) => {
 
-    console.log(stimuli)
-
         // file named such that {expID}_{pID}.csv will be in folder {expID}
         // TODO: change if you want a different file format or have different URL variables
-        var filename = urlVars.verID + '/' + urlVars.verID + '_' + urlVars.pID + '.csv';
+        var filename = `${urlVars.verID}/${urlVars.verID}_${urlVars.pID}_${auth.currentUser.uid}.csv`;
 
         // initialize storage and database references
         var storageRef = ref(storage, stimuli.project_id + '/' + filename)

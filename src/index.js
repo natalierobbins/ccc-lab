@@ -13,7 +13,9 @@ const router = createBrowserRouter([
   { path: '/admin', element: <App.Admin />},
   { path: '/combine', element: <App.Combine />},
   { path: '/e/:id/:ver', element: <App.Experiment />},
-  { path: '/login', element: <App.LogIn />}
+  { path: '/login', element: <App.LogIn />},
+  { path: '/modify', element: <App.ExpSelect />},
+  { path: '/modify/:id', element: <App.Builder />}
 ])
 
 root.render(

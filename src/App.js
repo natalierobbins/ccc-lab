@@ -1,9 +1,9 @@
-import Form from './components/builder'
+import Form, { ExpNav } from './components/builder'
 import FirebaseUpload from './components/upload'
 import AdminEditor from './components/admin.js'
 import { Header, Authentication } from './components/ui.js'
 import CSVCombine from './components/combine.js'
-import NavBody from './components/nav.js'
+import NavBody, { navigation } from './components/nav.js'
 import JsPsych from './components/jspsych.js'
 import 'jspsych/css/jspsych.css'
 
@@ -58,12 +58,18 @@ export const Admin = () => {
 
 export const Nav = () => {
   return (
-    <Wrapper page={<NavBody />} />
+    <Wrapper page={<NavBody title='Welcome!' links={navigation} />} />
   )
 }
 
 export const Experiment = () => {
   return (
     <JsPsych />
+  )
+}
+
+export const ExpSelect = () => {
+  return (
+    <Wrapper page={<ExpNav />} />
   )
 }

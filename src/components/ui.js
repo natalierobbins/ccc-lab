@@ -1,4 +1,4 @@
-import { setPersistence, inMemoryPersistence, GoogleAuthProvider, signInWithPopup } from 'firebase/auth'
+import { setPersistence, browserSessionPersistence } from 'firebase/auth'
 import firebase from 'firebase/compat/app';
 import * as firebaseui from 'firebaseui'
 import 'firebaseui/dist/firebaseui.css'
@@ -39,13 +39,13 @@ export const Title = (props) => {
 // }
 
 export const Authentication = ({body}) => {
-    const [authenticated, setAuthenticated] = useState(localStorage.getItem('authenticated'))
+    const [authenticated, setAuthenticated] = useState(auth.currentUser)
 
     useEffect(() => {
         const firebaseuiInit = () => {
             firebase.initializeApp(config)
             const ui = firebaseui.auth.AuthUI.getInstance() ||
-            new firebaseui.auth.AuthUI(firebase.auth())
+            new firebaseui.auth.AuthUI(auth)
             ui.start("#firebaseui-auth-container", {
                 signInOptions: [
                     firebase.auth.GoogleAuthProvider.PROVIDER_ID,
@@ -57,7 +57,6 @@ export const Authentication = ({body}) => {
                             var snapshot = await get(child(dbRef(database), 'users/'))
                             if (snapshot.val().includes(email)) {
                                 setAuthenticated(true)
-                                localStorage.setItem('authenticated', 1)
                             }
                         }
                         catch (err) {
@@ -69,7 +68,7 @@ export const Authentication = ({body}) => {
             });
         }
 
-        setPersistence(auth, inMemoryPersistence).then(() => {if (!authenticated) {firebaseuiInit()}})
+        setPersistence(auth, browserSessionPersistence).then(() => {if (!authenticated) {firebaseuiInit()}})
     }, [])
 
     return (

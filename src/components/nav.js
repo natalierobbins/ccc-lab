@@ -1,23 +1,34 @@
-import { Title } from './ui'
-import Search from '../assets/search.svg'
-import Lnk from '../assets/link.svg'
 import { Link } from 'react-router-dom'
 
-// const NavBody = () => {
-//     return (
-//         <Authentication body={<Nav />} />
-//     )
-// }
+export const navigation = [
+    {
+        'destination': '/create',
+        'text': 'Create new experiment',
+    },
+    {
+        'destination': '/modify',
+        'text': 'Modify existing experiment',
+    },
+    {
+        'destination': '/upload',
+        'text': 'Upload stimuli',
+    },
+    {
+        'destination': '/links',
+        'text': 'Generate links'
+    }
+]
 
-const NavBody = () => {
+const NavBody = (props) => {
     return (
         <div className='-flex -col -gap -jc-c -full-width -al-c'>
-            <h1>Welcome!</h1>
+            <h1>{props.title}</h1>
             <div className='-flex -col nav-button-wrapper -jc-c -full-width'>
-                <NavLink href='/' txt='Create new experiment' />
-                <NavLink href='/' txt='Modify existing experiment' />
-                <NavLink href='/' txt='Upload stimuli' />
-                <NavLink href='https://colab.research.google.com/drive/1Wijl3ebNZ8iMTp14VZrraygqerVKGmxE?usp=sharing' txt='Firebase download' />
+                {
+                    props.links.map((link) => {
+                        return ( <NavLink href={link.destination} txt={link.text} key={link.text} />)
+                    })
+                }
             </div>
         </div>
     )
