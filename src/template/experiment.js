@@ -23,23 +23,6 @@ export class Experiment {
         /*                               EXPERIMENT DATA                              */
         /* -------------------------------------------------------------------------- */
 
-        // TODO: Add more participant parameters here if needed.
-        this.participant = {
-            id: params.pID // accessing participant ID from params
-        }
-
-        // TODO: Add more experiment parameters here if needed.
-        this.experimentData = {
-            id: params.expID // accessing experiment ID from params
-        }
-
-        this.version = {
-            id: params.verID // accessing experiment ID from params
-        }
-         // Optional -- I store columns and their indices into my stimuli.json file for
-         // clearer, cleaner code. You can see me use this in the initTrials() function
-        this.columns = params.columns
-
         // Initialize the experiment timeline
         this.timeline = [];
 
@@ -49,19 +32,19 @@ export class Experiment {
 
         // Return current participant's ID
         this.pID = () => { 
-            return this.participant.id;
+            return params.pID;
         }
         // Return experiment's ID
         this.expID = () => {  
-            return this.experimentData.id;
+            return params.expID;
         }
 
         this.verID = () => {  
-            return this.version.id;
+            return params.verID;
         }
 
         /* -------------------------------------------------------------------------- */
-        /*                                   SETTERS                                  */
+        /*                                   ADDS                                     */
         /* -------------------------------------------------------------------------- */
 
         // push jsPsych block to timeline
@@ -145,7 +128,7 @@ export class Experiment {
          * If you are using Prolific, you should use this function to redirect
          * participants to the page Prolific specifies. */
         this.onFinish = function () {
-            console.log('finish')
+            console.log('Finished.')
             // TODO: Add Prolific or other redirects here
         }
 
@@ -219,13 +202,13 @@ export class Experiment {
                 questions: [
                     {
                         prompt: params.promptcontent,
-                        labels: params.options
+                        labels: params.options,
+                        required: true
                     }
                 ],
                 scale_width: 500,
                 on_start: async function() {
                     $('#countdown').text('')
-                    console.log('hello')
                     $('.jspsych-content-wrapper').css('visibility', 'hidden')
                     var req = ref(stimRef, `${stimulus[params.cols[params.files.stimulusContent]]}`)
                     const res = await getBlob(req)
@@ -251,7 +234,6 @@ export class Experiment {
                     else {
                         data.response = 'NA'
                     }
-                    console.log(data)
                 }
             }
         }
@@ -278,21 +260,27 @@ export class Experiment {
           * So, in the example below, we are accessing the stimuli list at i's text column
           */ 
         this.initTrials = (exp, stimuli, breaks) => {
-            for (let i = 0; i < stimuli.length; i++) {
-                var trial = initTrial(exp, stimuli[i]);
-
-                var block_size = stimuli.length / (breaks.num_breaks + 1)
-
-                if ((i + 1) % block_size == 0 && (i + 1) != stimuli.length) {
-                    trial['post_trial_gap'] = breaks.len_breaks
-                    trial['on_finish'] = function(data) {
-                        trial['on_finish'](data)
-                        initCountdown(breaks.len_breaks)
+            if (this.pID() == 'debug') {
+                add(initTrial(exp, stimuli[0]))
+            }
+            else {
+                for (let i = 0; i < stimuli.length; i++) {
+                    var trial = initTrial(exp, stimuli[i]);
+    
+                    var block_size = stimuli.length / (breaks.num_breaks + 1)
+    
+                    if ((i + 1) % block_size == 0 && (i + 1) != stimuli.length) {
+                        trial['post_trial_gap'] = breaks.len_breaks
+                        trial['on_finish'] = function(data) {
+                            trial['on_finish'](data)
+                            initCountdown(breaks.len_breaks)
+                        }
                     }
-                }
-                // push to timeline
-                add(trial);
-            } // for i
+                    // push to timeline
+                    add(trial);
+                } // for i
+            }
+
         }
 
         /* ----------------------------- POST-EXPERIMENT ---------------------------- */
@@ -325,13 +313,11 @@ export class Experiment {
         // putting it all together! this is the only function from the Experiment
         // class that we actually call in firebase.js
         this.init = () => {
-            console.log(firebaseStorage._location.path)
 
             // push pre experiment
             this.initPreExperiment();
             // push experiment trials -- in this case, expID is the same as the name of
             // each list, so we can access our given stimuli list this way
-            console.log('!!!', this.expID())
 
 
             this.initTrials(this.expID(), params.stimuli[this.verID()], params.breaks);
