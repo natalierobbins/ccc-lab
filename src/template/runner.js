@@ -74,6 +74,7 @@ const turkGetParam = (name) => {
     var regexS = "[?&]" + name + "=([^&#]*)";
     var regex = new RegExp(regexS);
     var results = regex.exec(window.location.href);
+
     if (results == null)
         return "";
     return results[1];
@@ -84,6 +85,11 @@ const turkGetParam = (name) => {
 // getParicipantCompletion()
 // returns value at participant in database
 var getParticipantCompletion = async (pID, database, stimuli) => {
+
+    if (pID == '') {
+        return null 
+    }
+
     try {
         var snapshot = await get(child(dbRef(database), `${stimuli.projectid}/${pID}`))
         console.log('Read successful')

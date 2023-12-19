@@ -1,8 +1,6 @@
 import { Title } from './ui'
-import Filter from '../assets/filter.svg'
 import * as _ from 'lodash'
 import * as $ from 'jquery'
-import Download from '../assets/download.svg'
 
 const CSVCombine = () => {
 
@@ -60,7 +58,7 @@ const CSVCombine = () => {
 
     return (
         <div className='-flex -col -gap -jc-c -al-c'>
-            <Title src={Filter} txt='CSV Combiner' />
+            {/* <Title src={Filter} txt='CSV Combiner' /> */}
             <div className='-flex -col form-wrapper'>
                 <h3>Upload</h3>
                 <p>The resulting .csv file will aggregate every .csv file in the folder(s) you upload.</p><p>You may only upload one folder at a time, but any subfolders will be combined automatically for you.</p>
@@ -78,7 +76,7 @@ const CSVCombine = () => {
                 </div>
                 <a id='downloadLink'>
                     <div className='-flex -jc-c -al-c download -gap'>
-                        <img className='icon' src={Download}></img>
+                        {/* <img className='icon' src={Download}></img> */}
                         Download result.csv
                     </div>
                 </a>

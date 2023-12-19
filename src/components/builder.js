@@ -1,11 +1,5 @@
 import { useEffect, useState } from 'react';
-import Trash from '../assets/trash.svg'
-import Doc from '../assets/document.svg'
-import Star from '../assets/star.svg'
 import * as $ from 'jquery'
-import Config from '../assets/config.svg'
-import { Title } from './ui.js'
-import Download from '../assets/download.svg'
 import NavBody from './nav.js'
 import { ref, getBlob, listAll } from 'firebase/storage'
 import { storage, auth } from '../firebase'
@@ -241,23 +235,39 @@ const Form = () => {
     const { id } = useParams()
 
     useEffect(() => {
-        const getExpConfig = (() => {
-            setConfig(getConfig(id))
-            console.log(config)
-        })
+        async function getExpConfig () {
+            const req = await getConfig(id)
+            return req
+        }
 
         if (!config) {
-            getExpConfig()
+            getExpConfig().then((res) => {
+                setConfig(res)
+                console.log(res)
+            })
         }
 
     }, [config])
+
+    const projectId = {
+        title: 'Your project',
+        fields: [
+            {
+                label: 'Project name',
+                attributes: {
+                    id: 'project_id',
+                    name: 'project_id',
+                    type: 'text',
+                }
+            }
+        ]
+    }
 
     if (config) {
         return (
             <form>
                 <h1>Modify existing experiment</h1>
-                <div>
-                </div>
+                <FieldGroup opts={projectId} />
             </form>
         )    
     }
@@ -393,6 +403,26 @@ const Form = () => {
     // )
 }
 
+const FieldGroup = ({opts}) => {
+    return (
+        <div className="field-group-title-wrapper -full-width -flex -col">
+            <div>{opts.title}</div>
+            <div className='field-group-wrapper'>
+                <Field opts={opts.fields[0]} />
+            </div>
+        </div>
+    )
+}
+
+const Field = ({opts}) => {
+    return (
+        <div className='field-wrapper -flex'>
+            {opts.label}
+            <input {...opts.attributes} />
+        </div>
+    )
+}
+
 const TextBlock = (props) => {
     return (
         <div className="-flex -col label-input-wrapper -jc-c -full-width">
@@ -400,7 +430,7 @@ const TextBlock = (props) => {
             <div className="-flex -jc-c instructions-wrapper -al-c">
                 <textarea form='main' onChange={props.edit} className={props.type} id={`${props.type}-${props.i}`}></textarea>
                 <div className='icon-wrapper' onClick={props.delete}>
-                    <img src={Trash} className='icon'></img>
+                    {/* <img src={Trash} className='icon'></img> */}
                 </div>
             </div>
         </div>
@@ -515,14 +545,14 @@ const TrialBlock = (props) => {
                 <div key={option.idx} className='-flex -al-c label-input-wrapper option-wrapper -jc-c'>
                     <input id={`options-${option.idx}`} form='main' className='options' type='text' onChange={e => editOptions(option.idx, e)}></input>
                     <div onClick={e => removeOptions(option.idx, e)} className='icon-wrapper'>
-                        <img className='icon' src={Trash}></img>
+                        {/* <img className='icon' src={Trash}></img> */}
                     </div>
                 </div>
                 )
             })}
             {options && (
                 <div onClick={addOptions} className='icon-wrapper -flex -jc-c -al-c add'>
-                    <img src={Doc} className='icon' id='option_add'></img>
+                    {/* <img src={Doc} className='icon' id='option_add'></img> */}
                     <p>Add</p>
                 </div>
             )}

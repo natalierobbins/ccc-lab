@@ -314,6 +314,8 @@ export class Experiment {
         // class that we actually call in firebase.js
         this.init = () => {
 
+            console.log(this.pID())
+
             // push pre experiment
             this.initPreExperiment();
             // push experiment trials -- in this case, expID is the same as the name of

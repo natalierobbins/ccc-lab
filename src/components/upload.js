@@ -3,7 +3,6 @@ import { storage } from '../firebase.js'
 import 'firebaseui/dist/firebaseui.css'
 import * as $ from 'jquery'
 import { Title, Authentication } from './ui.js'
-import FBUpload from '../assets/upload.svg'
 
 const FirebaseUpload = () => {
     return <Authentication body={<UploadBody />} />
@@ -31,7 +30,7 @@ const UploadBody = () => {
 
     return (
         <div className='-flex -col -gap -jc-c -al-c'>
-            <Title src={FBUpload} txt='Firebase upload (CCC Lab)' />
+            {/* <Title src={FBUpload} txt='Firebase upload (CCC Lab)' /> */}
             <form id='main' className="-flex -jc-c -col">
                 <div className=' -flex -col form-wrapper'>
                     <h3>upload config.json</h3>
