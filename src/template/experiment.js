@@ -7,7 +7,7 @@
 // The contents of this file are passed to the params variable of the
 // Experiment object.
 
-import { uploadBytes, ref, getBlob } from 'firebase/storage'
+import { uploadBytes, ref, getBlob, getDownloadURL } from 'firebase/storage'
 import { set } from 'firebase/database';
 import { initJsPsych } from 'jspsych'
 import jsPsychPreload from '@jspsych/plugin-preload';
@@ -132,11 +132,38 @@ export class Experiment {
             // TODO: Add Prolific or other redirects here
         }
 
+        this.fileCheck = async () => {
+            var stim = params.stimuli[this.verID()]
+            var missing = []
+
+            for (var idx in stim) {
+                var filename = stim[idx][params.cols[params.files.stimulusContent]]
+                try {
+                    var req = ref(stimRef, filename)
+                    const res = await getDownloadURL(req)
+                }
+                catch (e) {
+                    missing.push(filename)
+                }
+            }
+
+            if (missing.length) {
+                console.error('Missing files:', missing)
+            }
+            else {
+                console.log('No missing files')
+            }
+        }
+
         /* ----------------------------- PRE-EXPERIMENT ----------------------------- */
 
         // Use this function to create any trials that should appear before the main
         // experiment. For example:
         this.initPreExperiment = () => {
+
+            if (this.pID() == 'debug') {
+                this.fileCheck()
+            }
 
             // preload plugin from jsPsych. useful especially for audio and image stimuli
             var preload = {
@@ -228,7 +255,7 @@ export class Experiment {
                     params.output.forEach(item => {
                         data[item] = stimulus[params.cols[item]]
                     })
-                    if (data.response['Q0']) {
+                    if (data.response['Q0'] != undefined) {
                         data.response = data.response['Q0'] + 1
                     }
                     else {
@@ -264,17 +291,20 @@ export class Experiment {
                 add(initTrial(exp, stimuli[0]))
             }
             else {
-                for (let i = 0; i < stimuli.length; i++) {
-                    var trial = initTrial(exp, stimuli[i]);
+                var block_size = (stimuli.length / (breaks.num_breaks + 1)) + 1
+                var backshift = 0
+                for (let i = 0; (i - backshift) < stimuli.length; i++) {
+
+                    var trial = initTrial(exp, stimuli[i - backshift]);
+
     
-                    var block_size = stimuli.length / (breaks.num_breaks + 1)
-    
-                    if ((i + 1) % block_size == 0 && (i + 1) != stimuli.length) {
+                    if ((i + 1) % block_size == 0 && ((i + 1) - backshift) != stimuli.length) {
                         trial['post_trial_gap'] = breaks.len_breaks
                         trial['on_finish'] = function(data) {
                             trial['on_finish'](data)
                             initCountdown(breaks.len_breaks)
                         }
+                        backshift += 1
                     }
                     // push to timeline
                     add(trial);
@@ -313,8 +343,6 @@ export class Experiment {
         // putting it all together! this is the only function from the Experiment
         // class that we actually call in firebase.js
         this.init = () => {
-
-            console.log(this.pID())
 
             // push pre experiment
             this.initPreExperiment();

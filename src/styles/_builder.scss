@@ -7,7 +7,35 @@
 }
 
 label {
-    color: $blue-dark;
+    color: $green;
+    font-size: 15px;
+    width: 20%;
+}
+
+h2 {
+    margin-bottom: 5px;
+    color: $green-dark;
+    font-size: 18px;
+}
+
+h1 {
+    text-align: center;
+}
+
+.field-group-wrapper {
+    background-color: #F6F6F6;
+    border: 1px solid #D4D4D4;
+    border-radius: 5px;
+    padding: 15px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 60%;
 }
 
 .option-wrapper {
