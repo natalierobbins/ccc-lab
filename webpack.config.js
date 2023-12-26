@@ -43,6 +43,17 @@ module.exports = {
                 test: /\.(svg|png|jpg|jpeg|gif)$/i,
                 type: 'asset/resource',
                 // loader: 'file-loader'
+            },
+            {
+                test: /\.json$/,
+                loader: 'json-loader'
+            },
+            {
+                test: /\.wav$/,
+                loader: 'file-loader',
+                options: {
+                    name: '[name].[ext]'
+                }
             }
         ],
     }

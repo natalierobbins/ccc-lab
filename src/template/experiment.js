@@ -237,14 +237,20 @@ export class Experiment {
                 on_start: async function() {
                     $('#countdown').text('')
                     $('.jspsych-content-wrapper').css('visibility', 'hidden')
-                    var req = ref(stimRef, `${stimulus[params.cols[params.files.stimulusContent]]}`)
-                    const res = await getBlob(req)
-                    var audio_src = URL.createObjectURL(res)
-                    var audio = new Audio(audio_src)
-                    audio.addEventListener('ended', (e) => {
-                        $('.jspsych-content-wrapper').css('visibility', 'visible')
+                    // var req = ref(stimRef, `${stimulus[params.cols[params.files.stimulusContent]]}`)
+                    // const res = await getBlob(req)
+                    // var audio_src = URL.createObjectURL(res)
+
+                    //var audio = new Audio(`${audiopath}/${stimulus[params.cols[params.files.stimulusContent]]}`)
+ 
+                    import(`../data/stimuli/${params.files.stimulusFolder}/${stimulus[params.cols[params.files.stimulusContent]]}`).then(({default: audio_src}) => {
+                        console.log(audio_src)
+                        var audio = new Audio(audio_src)
+                        audio.addEventListener('ended', (e) => {
+                            $('.jspsych-content-wrapper').css('visibility', 'visible')
+                        })
+                        audio.play()
                     })
-                    audio.play()
                 },
                 // here is an example of an on_finish function that checks if a
                 // participant response is correct or not and creates a new 

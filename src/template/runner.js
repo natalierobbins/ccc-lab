@@ -3,14 +3,17 @@ import * as $ from 'jquery'
 import * as _ from 'underscore'
 import { signInAnonymously } from 'firebase/auth'
 import { get, ref as dbRef, child } from 'firebase/database'
-import { ref, getBlob } from 'firebase/storage'
+import { ref } from 'firebase/storage'
 import { Experiment } from './experiment.js'
 
 export async function getConfig(id) {
-    const configRef = ref(storage, `/_configs/${id}_config.json`)
-    const req = await getBlob(configRef)
-    const res = await req.text()
-    return JSON.parse(res)
+    // const configRef = ref(storage, `/_configs/${id}_config.json`)
+    // const req = await getBlob(configRef)
+    // const res = await req.text()
+    import(`../data/configs/${id}_config.json`).then((json) => {
+        console.log(json)
+        return json
+    })
 }
 
 const runner = (exp, ver) => {
@@ -29,7 +32,7 @@ const runner = (exp, ver) => {
 
         document.title = urlVars.expID
 
-        getConfig(urlVars.expID)
+        import(`../data/configs/${urlVars.expID}_config.json`)
             .then(config => {
 
             getParticipantCompletion(urlVars.pID, database, config).then(res => {
