@@ -249,25 +249,72 @@ const Form = () => {
 
     }, [config])
 
-    const projectId = {
-        title: 'Your project',
-        fields: [
-            {
-                label: 'Project name',
-                attributes: {
-                    id: 'project_id',
-                    name: 'project_id',
-                    type: 'text',
+    const projectId = () => {
+
+        return {
+            title: 'Your project',
+            fields: [
+                {
+                    label: 'Project name',
+                    attributes: {
+                        id: 'project_id',
+                        name: 'project_id',
+                        type: 'text',
+                        value: config ? config.project_id : ''
+                    }
                 }
-            }
-        ]
+            ]
+        }
+    }
+
+    const stimuli = () => {
+        return {
+            title: 'Stimuli',
+            fields: [
+                {
+                    label: 'Separate-by column',
+                    attributes: {
+                        id: 'column',
+                        name: 'column',
+                        type: 'select',
+                        value: config ? config.column : ''
+                    }
+                },
+                {
+                    label: 'Sort-by column',
+                    attributes: {
+
+                    }
+                },
+                {
+                    label: 'Stimulus column',
+                    attributes: {
+
+                    }
+                },
+                {
+                    label: 'Stimulus type',
+                    attributes: {
+
+                    }
+                },
+                {
+                    label: 'Stimulus folder',
+                    attributes: {
+
+                    }
+                },
+            ]
+        }
     }
 
     if (config) {
+
+        console.log(projectId(config.project_id))
         return (
             <form>
                 <h1>Modify existing experiment</h1>
-                <FieldGroup opts={projectId} />
+                <FieldGroup opts={projectId()} />
             </form>
         )    
     }
@@ -406,8 +453,8 @@ const Form = () => {
 const FieldGroup = ({opts}) => {
     return (
         <div className="field-group-title-wrapper -full-width -flex -col">
-            <div>{opts.title}</div>
-            <div className='field-group-wrapper'>
+            <h2>{opts.title}</h2>
+            <div className='field-group-wrapper -full-width -flex -col'>
                 <Field opts={opts.fields[0]} />
             </div>
         </div>
@@ -416,8 +463,8 @@ const FieldGroup = ({opts}) => {
 
 const Field = ({opts}) => {
     return (
-        <div className='field-wrapper -flex'>
-            {opts.label}
+        <div className='field-wrapper -flex -jc-c -al-c -gap'>
+            <label>{opts.label}</label>
             <input {...opts.attributes} />
         </div>
     )
