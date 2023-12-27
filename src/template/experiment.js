@@ -244,7 +244,6 @@ export class Experiment {
                     //var audio = new Audio(`${audiopath}/${stimulus[params.cols[params.files.stimulusContent]]}`)
  
                     import(`../data/stimuli/${params.files.stimulusFolder}/${stimulus[params.cols[params.files.stimulusContent]]}`).then(({default: audio_src}) => {
-                        console.log(audio_src)
                         var audio = new Audio(audio_src)
                         audio.addEventListener('ended', (e) => {
                             $('.jspsych-content-wrapper').css('visibility', 'visible')
