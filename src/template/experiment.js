@@ -134,24 +134,13 @@ export class Experiment {
 
         this.fileCheck = async () => {
             var stim = params.stimuli[this.verID()]
-            var missing = []
 
             for (var idx in stim) {
                 var filename = stim[idx][params.cols[params.files.stimulusContent]]
-                try {
-                    var req = ref(stimRef, filename)
-                    const res = await getDownloadURL(req)
-                }
-                catch (e) {
-                    missing.push(filename)
-                }
-            }
-
-            if (missing.length) {
-                console.error('Missing files:', missing)
-            }
-            else {
-                console.log('No missing files')
+                import(`../data/stimuli/${params.files.stimulusFolder}/${filename}`)
+                    .catch((err) => {
+                        console.log(`ERROR -- MISSING FILE: ${filename}`)
+                    })
             }
         }
 
