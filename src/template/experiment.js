@@ -8,7 +8,8 @@
 // Experiment object.
 
 import { uploadBytes, ref, getBlob, getDownloadURL } from 'firebase/storage'
-import { set } from 'firebase/database';
+import { set, ref as dbRef } from 'firebase/database';
+import { database } from '../firebase'
 import { initJsPsych } from 'jspsych'
 import jsPsychPreload from '@jspsych/plugin-preload';
 import jsPsychHtmlKeyboardResponse from '@jspsych/plugin-html-keyboard-response';
@@ -136,12 +137,29 @@ export class Experiment {
             var stim = params.stimuli[this.verID()]
 
             for (var idx in stim) {
-                var filename = stim[idx][params.cols[params.files.stimulusContent]]
+                const filename = stim[idx][params.cols[params.files.stimulusContent]]
                 import(`../data/stimuli/${params.files.stimulusFolder}/${filename}`)
-                    .catch((err) => {
-                        console.log(`ERROR -- MISSING FILE: ${filename}`)
+                    .catch((e) => {
+                        console.error(`ERROR -- MISSING FILE: ${filename}`)
+                        logError(e)
                     })
             }
+        }
+
+        const logError = (e) => {
+            const now = new Date()
+            const id = now.toISOString().replace(/[\-\.\:ZT]/g,"")
+            const err = {
+                date: now.toLocaleDateString(),
+                time: now.toLocaleTimeString(),
+                experiment: this.expID(),
+                version: this.verID(),
+                participant: this.pID(),
+                message: e.message,
+            }
+
+            const errorRef = dbRef(database, `errors/${id}-${this.pID()}`)
+            set(errorRef, err)
         }
 
         /* ----------------------------- PRE-EXPERIMENT ----------------------------- */
@@ -232,13 +250,18 @@ export class Experiment {
 
                     //var audio = new Audio(`${audiopath}/${stimulus[params.cols[params.files.stimulusContent]]}`)
  
-                    import(`../data/stimuli/${params.files.stimulusFolder}/${stimulus[params.cols[params.files.stimulusContent]]}`).then(({default: audio_src}) => {
-                        var audio = new Audio(audio_src)
-                        audio.addEventListener('ended', (e) => {
-                            $('.jspsych-content-wrapper').css('visibility', 'visible')
+                    import(`../data/stimuli/${params.files.stimulusFolder}/${stimulus[params.cols[params.files.stimulusContent]]}`)
+                        .then(({default: audio_src}) => {
+                            var audio = new Audio(audio_src)
+                            audio.addEventListener('ended', (e) => {
+                                $('.jspsych-content-wrapper').css('visibility', 'visible')
+                            })
+                            audio.play()
                         })
-                        audio.play()
-                    })
+                        .catch((err) => {
+                            console.error(err)
+                            logError(err)
+                        })
                 },
                 // here is an example of an on_finish function that checks if a
                 // participant response is correct or not and creates a new 
@@ -324,8 +347,13 @@ export class Experiment {
                 // this function will run at beginning of this block to save participant
                 // and data to Firebase
                 on_start: function() {
-                    saveDataToStorage(jsPsych.data.get().csv())
-                    addParticipantToDatabase();
+                    try {
+                        saveDataToStorage(jsPsych.data.get().csv())
+                        addParticipantToDatabase();
+                    }
+                    catch (err) {
+                        logError(err)
+                    }
                 }
             }
             // push to timeline
